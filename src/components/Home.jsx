@@ -5,10 +5,7 @@ import './Home.css';
 
 const Home = () => {
   const handleDownloadResume = () => {
-    const link = document.createElement('a');
-    link.href = '/resume.pdf';
-    link.download = 'Dhanalakshmi_A_Resume.pdf';
-    link.click();
+  window.open("/dhanalakshmi_resumes_single_page.pdf", "_blank");
   };
 
   return (

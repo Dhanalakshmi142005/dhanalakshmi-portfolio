@@ -4,6 +4,8 @@ import { FiSend, FiMail, FiPhone, FiMapPin, FiCheckCircle, FiAlertCircle } from 
 import emailjs from '@emailjs/browser';
 import './Contact.css';
 
+emailjs.init('0OwcE_yqb6HEjzwYqXtyq');
+
 const Contact = () => {
   const formRef = useRef();
   const [formData, setFormData] = useState({
@@ -20,11 +22,31 @@ const Contact = () => {
     if (status.message) setStatus({ type: '', message: '' });
   };
 
+  const validateForm = () => {
+    const missing = [];
+    if (!formData.name.trim()) missing.push('Name');
+    if (!formData.email.trim()) missing.push('Email');
+    if (!formData.subject.trim()) missing.push('Subject');
+    if (!formData.message.trim()) missing.push('Message');
+
+    if (missing.length) {
+      return `Please fill in: ${missing.join(', ')}`;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email.trim())) {
+      return 'Please enter a valid email address.';
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-      setStatus({ type: 'error', message: 'Please fill in all fields.' });
+    const validationError = validateForm();
+    if (validationError) {
+      setStatus({ type: 'error', message: validationError });
       return;
     }
 
@@ -33,13 +55,13 @@ const Contact = () => {
 
     try {
       const result = await emailjs.sendForm(
-        'YOUR_SERVICE_ID',
-        'YOUR_TEMPLATE_ID',
-        formRef.current,
-        'YOUR_PUBLIC_KEY'
+         'service_tvwkjzp',
+  'template_ohvbhpo',
+  formRef.current,
+  '2lS-7qWo1CJmI6Oo7'
       );
 
-      if (result.text === 'OK') {
+if (result.text === 'OK') {
         setStatus({
           type: 'success',
           message: 'Message sent successfully! I will get back to you soon.',
@@ -47,9 +69,11 @@ const Contact = () => {
         setFormData({ name: '', email: '', subject: '', message: '' });
       }
     } catch (error) {
+      console.error('EmailJS send failed:', error);
+      console.error('Error details:', error.text || error.message || JSON.stringify(error));
       setStatus({
         type: 'error',
-        message: 'Failed to send message. Please try again later.',
+        message: error.text || error.message || 'Failed to send message. Please try again later.',
       });
     } finally {
       setSending(false);
