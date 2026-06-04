@@ -4,8 +4,6 @@ import { FiSend, FiMail, FiPhone, FiMapPin, FiCheckCircle, FiAlertCircle } from 
 import emailjs from '@emailjs/browser';
 import './Contact.css';
 
-emailjs.init('0OwcE_yqb6HEjzwYqXtyq');
-
 const Contact = () => {
   const formRef = useRef();
   const [formData, setFormData] = useState({
@@ -55,13 +53,13 @@ const Contact = () => {
 
     try {
       const result = await emailjs.sendForm(
-         'service_tvwkjzp',
-  'template_ohvbhpo',
-  formRef.current,
-  '2lS-7qWo1CJmI6Oo7'
+        'service_tvwkjzp',
+        'template_ohvbhpo',
+        formRef.current,
+        '2lS-7qWo1CJmI6Oo7'
       );
 
-if (result.text === 'OK') {
+      if (result.text === 'OK') {
         setStatus({
           type: 'success',
           message: 'Message sent successfully! I will get back to you soon.',
@@ -69,12 +67,27 @@ if (result.text === 'OK') {
         setFormData({ name: '', email: '', subject: '', message: '' });
       }
     } catch (error) {
-      console.error('EmailJS send failed:', error);
-      console.error('Error details:', error.text || error.message || JSON.stringify(error));
+      console.error('=== EMAILJS DEBUG ===');
+      console.error('error:', error);
+      console.error('error.status:', error.status);
+      console.error('error.text:', error.text);
+      console.error('error.message:', error.message);
+      console.error('full API response (JSON):', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+
+      const errorDetail =
+        error.text ||
+        error.message ||
+        (error.status ? `Status ${error.status}` : null) ||
+        'Unknown error (check browser console for full details)';
+
+      const errorMessage = `EmailJS Error: ${errorDetail}`;
+
       setStatus({
         type: 'error',
-        message: error.text || error.message || 'Failed to send message. Please try again later.',
+        message: errorMessage,
       });
+
+      alert(errorMessage);
     } finally {
       setSending(false);
     }
